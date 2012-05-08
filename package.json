@@ -1,0 +1,20 @@
+{
+  "author": "VIDAL Software",
+  "name": "caeliajs",
+  "description": "Caelia done right :-)",
+  "version": "0.8.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:softwarevidal/Caelia.git"
+  },
+  "main": "main.js",
+  "engines": {
+    "node": "~0.6.6"
+  },
+  "dependencies": {
+     "forever"  : "0.8.5",
+     "commander": "0.5.2",
+     "express"  : "2.5.8",
+     "soap"     : "git://github.com/tonyskn/node-soap.git"
+  }
+}
