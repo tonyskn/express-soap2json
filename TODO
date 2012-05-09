@@ -1,3 +1,4 @@
 - Add IT tests
+- Rearrange sources and push to github
+- Bootstrap express server for dev/standalone mode
 - Handle complex input objects through querystring
-- Figure out error handling
