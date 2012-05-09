@@ -1,20 +1,26 @@
 {
-  "author": "VIDAL Software",
-  "name": "caeliajs",
-  "description": "Caelia done right :-)",
-  "version": "0.8.0",
+  "name": "express-soap",
+  "description": "Enables an Express server to proxy to an underlying SOAP server through an emulated JSON/HTTP API",
+  "version": "0.1.0",
+  "author": "Tony Sokhon <tonyskn@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git@github.com:softwarevidal/Caelia.git"
+    "url": "https://github.com/tonyskn/express-soap"
   },
-  "main": "main.js",
+  "main": "index.js",
+  "scripts": {
+     "start": "node server.js",
+     "test": "node_modules/.bin/mocha test/*.js"
+  },
   "engines": {
-    "node": "~0.6.6"
+    "node": ">=0.6.0"
   },
   "dependencies": {
-     "forever"  : "0.8.5",
+     "soap"     : "0.2.4"
+  },
+  "devDependencies": {
      "commander": "0.5.2",
      "express"  : "2.5.8",
-     "soap"     : "0.2.4"
+     "mocha"    : "1.0.3"
   }
 }

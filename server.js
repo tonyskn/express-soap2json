@@ -1,11 +1,12 @@
 var config = require("commander"),
-    soapController = require("./lib/controller"),
+    soapController = require("./index.js"),
     express = require("express"),
     server = express.createServer();
 
 config
    .option("-p, --port [port]", "Server port", 9876)
-   .option("-u, --zapi-url [url]", "Merlin API server url", "http://localhost:9000/merlin-server/services/")
+   .option("-u, --soap-url [url]", "SOAP server url", "http://localhost:9000/merlin-server/services/")
+   .option("-P, --prefix [prefix]", "Url prefix", "")
    .parse(process.argv);
 
 // our catcher for log messages
@@ -14,9 +15,10 @@ process.addListener('uncaughtException', function (err, stack) {
    console.log(message);
 });
 
-soapController.configure(server, config.zapiUrl);
+soapController.configure(server, config.soapUrl, config.prefix);
 
-console.log("Using SOAP server on: ", config.zapiUrl);
+console.log("Using SOAP server on: ", config.soapUrl);
 console.log("Listening on port: ", config.port);
+console.log("Service urls use prefix: ", config.prefix);
 
 server.listen(config.port);
