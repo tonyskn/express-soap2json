@@ -1,5 +1,5 @@
 var config = require("commander"),
-    controller = require("./lib/controller").withConfig(config),
+    soapController = require("./lib/controller"),
     express = require("express"),
     server = express.createServer();
 
@@ -14,7 +14,7 @@ process.addListener('uncaughtException', function (err, stack) {
    console.log(message);
 });
 
-controller.withServer(server);
+soapController.configure(server, config.zapiUrl);
 
 console.log("Using SOAP server on: ", config.zapiUrl);
 console.log("Listening on port: ", config.port);
