@@ -15,6 +15,6 @@
      "forever"  : "0.8.5",
      "commander": "0.5.2",
      "express"  : "2.5.8",
-     "soap"     : "git://github.com/tonyskn/node-soap.git"
+     "soap"     : "0.2.4"
   }
 }
