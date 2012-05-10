@@ -36,7 +36,8 @@ var resolveService = function(req, res, next) {
 
    var description = client.describe(),
        availableMethods = description[req.params.service][req.params.service+"HttpPort"],
-       msg = "Unknown method: " + req.params.method + "\nUse one of: _describe, " + Object.keys(availableMethods).join(", ");
+       msg = "Unknown method: " + req.params.method + "\n"
+           + "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
 
    if (req.params.method === "_describe") {
       res.send( JSON.stringify(description), {"Content-Type": "application/json"} );
@@ -57,12 +58,15 @@ var resolveService = function(req, res, next) {
 var normalizeQuerystring = function(req, res, next) {
    // validate there are no alien parameter names
    // in queryString
-   Object.keys(req.query).forEach(function (key) {
-      if (typeof req._spec[key] === "undefined") {
-         var msg = "Unexpected parameter: "+key+"\nUse one of: "+Object.keys(req._spec).join(", ");
-         throw new CustomError(msg, 400);
+   for (var querystringKey in req.query) {
+      if ( req.query.hasOwnProperty(querystringKey)
+          && typeof req._spec[querystringKey] === "undefined" ) {
+         var msg = "Unexpected parameter: " + querystringKey + "\n"
+                 + "Use one of: " + Object.keys(req._spec).join(", ");
+         next(new CustomError(msg, 400));
+         return;
       }
-   });
+   }
 
    // populate soap query parameters from queryString
    // taking into account 'array' typed fields
@@ -73,13 +77,16 @@ var normalizeQuerystring = function(req, res, next) {
          query[key] = {};
          var specKeys = Object.keys(spec),
              specKey = specKeys[0];
+
          // behaviour for array fields
          if (specKeys.length === 1 && specKey.substr(-2) === "[]")
             query[key][specKey.substr(0, specKey.length-2)] = querystringValue.split(",");
+
          //TODO implement behaviour for complex input objects
       } else {
          query[key] = querystringValue;
       }
+
       return query;
    }, {});
 
@@ -89,6 +96,8 @@ var normalizeQuerystring = function(req, res, next) {
 
 exports.configure = function(express, soapServerUrl, prefix) {
    prefix = prefix || "";
+   if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
+   if (prefix.substr(-1) !== "/") prefix += "/";
 
    express.error(function(err, req, res, next) {
       if (err instanceof CustomError) {
@@ -98,19 +107,20 @@ exports.configure = function(express, soapServerUrl, prefix) {
       }
    });
 
-   if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
-   if (prefix.substr(-1) !== "/") prefix += "/";
-   express.get( (prefix || "") + ":service/:method", [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring], function(req, res, next) {
-      req._service( req._query, function(err, result) {
-         if (err) { 
-            res.send(err.message, 500);
-            return;
-         }
+   express.get( prefix+":service/:method", 
+      [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring], 
+      function(req, res, next) {
+         req._service( req._query, function(err, result) {
+            if (err) { 
+               res.send(err.message, 500);
+               return;
+            }
 
-         var json = JSON.stringify(result);
-         res.send(json, {"Content-Type": "application/json"});
-      } );
-   });
+            var json = JSON.stringify(result);
+            res.send(json, {"Content-Type": "application/json"});
+         } );
+      }
+   );
 
-   return this;
+   return express;
 }; 
