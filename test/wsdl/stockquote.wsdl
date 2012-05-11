@@ -9,13 +9,22 @@
 
     <wsdl:types>
        <xsd:schema targetNamespace="http://example.com/stockquote.xsd" xmlns:xsd="http://www.w3.org/2000/10/XMLSchema">
+            <xsd:complexType name="ArrayOfTrade">
+               <xsd:sequence>
+                  <xsd:element maxOccurs="unbounded" minOccurs="0" name="Trade" nillable="true" type="tns:Trade"/>
+               </xsd:sequence>           
+            </xsd:complexType>
+            <xsd:simpleType name="Trade">
+              <xsd:restriction base="string">
+                 <xsd:enumeration value="AAPL" />
+                 <xsd:enumeration value="GOOG" />
+              </xsd:restriction>
+           </xsd:simpleType>
            <xsd:element name="TradePriceRequest">
-              <xsd:simpleType>
-                 <xsd:restriction base="string">
-                    <xsd:enumeration value="AAPL" />
-                    <xsd:enumeration value="GOOG" />
-                 </xsd:restriction>
-              </xsd:simpleType>
+              <xsd:complexType>
+                  <xsd:sequence>
+                     <xsd:element maxOccurs="1" minOccurs="1" name="tradeList" nillable="true" type="tns:ArrayOfTrade"/></xsd:sequence>
+              </xsd:complexType>
            </xsd:element>
            <xsd:element name="TradePrice">
               <xsd:complexType>

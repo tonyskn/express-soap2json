@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
      "start": "node server.js",
-     "test": "node_modules/.bin/mocha test/*.js"
+     "test": "node_modules/.bin/mocha -R spec -u exports test/*.js"
   },
   "engines": {
     "node": ">=0.6.0"
@@ -21,6 +21,7 @@
   "devDependencies": {
      "commander": "0.5.2",
      "express"  : "2.5.8",
-     "mocha"    : "1.0.3"
+     "mocha"    : "1.0.3",
+     "request"  : "2.9.0"
   }
 }

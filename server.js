@@ -5,7 +5,7 @@ var config = require("commander"),
 
 config
    .option("-p, --port [port]", "Server port", 9876)
-   .option("-u, --soap-url [url]", "SOAP server url", "http://localhost:9000/merlin-server/services/")
+   .option("-u, --soap-url [url]", "SOAP server url", "http://localhost:15099/")
    .option("-P, --prefix [prefix]", "Url prefix", "")
    .parse(process.argv);
 

@@ -34,8 +34,9 @@ var resolveWsdl = function(soapServerUrl) {
 var resolveService = function(req, res, next) {
    var client = req._client;
 
-   var description = client.describe(),
-       availableMethods = description[req.params.service][req.params.service+"HttpPort"],
+   var description = client.describe();
+   console.log(JSON.stringify(description));
+   var availableMethods = description[req.params.service][req.params.service+"HttpPort"],
        msg = "Unknown method: " + req.params.method + "\n"
            + "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
 
