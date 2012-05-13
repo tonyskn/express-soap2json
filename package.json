@@ -1,11 +1,11 @@
 {
-  "name": "express-soap",
+  "name": "express-soap2json",
   "description": "Enables an Express server to proxy to an underlying SOAP server through an emulated JSON/HTTP API",
   "version": "0.1.0",
   "author": "Tony Sokhon <tonyskn@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tonyskn/express-soap"
+    "url": "https://github.com/tonyskn/express-soap2json"
   },
   "main": "./index.js",
   "bin" : {
