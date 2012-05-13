@@ -20,7 +20,7 @@ var resolveWsdl = function(soapServerUrl) {
          }
 
          if (typeof client === "undefined") { 
-            next(new CustomError("Unknown WSDL: " + serviceName, 400));
+            next(new CustomError("Unknown WSDL: " + serviceName, 404));
             return;
          }
 
@@ -32,13 +32,16 @@ var resolveWsdl = function(soapServerUrl) {
 
 
 var resolveService = function(req, res, next) {
-   var client = req._client;
+   var objValue = function(obj) {
+      return obj[Object.keys(obj)[0]];
+   };
 
-   var description = client.describe();
-   console.log(JSON.stringify(description));
-   var availableMethods = description[req.params.service][req.params.service+"HttpPort"],
-       msg = "Unknown method: " + req.params.method + "\n"
-           + "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
+   var client = req._client,
+       description = client.describe(),
+       service = req.params.service,
+       availableMethods = objValue(objValue(description)),
+       msg = "Unknown method: " + req.params.method + "\n" +
+             "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
 
    if (req.params.method === "_describe") {
       res.send( JSON.stringify(description), {"Content-Type": "application/json"} );
@@ -60,10 +63,10 @@ var normalizeQuerystring = function(req, res, next) {
    // validate there are no alien parameter names
    // in queryString
    for (var querystringKey in req.query) {
-      if ( req.query.hasOwnProperty(querystringKey)
-          && typeof req._spec[querystringKey] === "undefined" ) {
-         var msg = "Unexpected parameter: " + querystringKey + "\n"
-                 + "Use one of: " + Object.keys(req._spec).join(", ");
+      if ( req.query.hasOwnProperty(querystringKey) &&
+          typeof req._spec[querystringKey] === "undefined" ) {
+         var msg = "Unexpected parameter: " + querystringKey + "\n" +
+                   "Use one of: " + Object.keys(req._spec).join(", ");
          next(new CustomError(msg, 400));
          return;
       }
@@ -96,9 +99,10 @@ var normalizeQuerystring = function(req, res, next) {
 
 
 exports.configure = function(express, soapServerUrl, prefix) {
-   prefix = prefix || "";
+   prefix = prefix || "/";
    if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
    if (prefix.substr(-1) !== "/") prefix += "/";
+   if (prefix[0] !== "/") prefix = "/"+prefix;
 
    express.error(function(err, req, res, next) {
       if (err instanceof CustomError) {

@@ -5,19 +5,37 @@ var fs = require('fs'),
     http = require('http');
 
 var service = { 
-    StockQuoteService: { 
-        StockQuotePort: { 
-            GetLastTradePrice: function(args) {
-                return { price: 19.56 };
-            }
-        }
+ StockQuoteService: { 
+    StockQuotePort: { 
+       GetLastTradePrice: function(args) {
+          if (JSON.stringify(args.tradeList.Trade) === '["GOOG","AAPL"]')
+             return { price: 19.56 };
+          else
+             return null;
+       }
     }
-}
-
-var proxy;
+ }};
 
 module.exports = {
-    'Express SOAP Proxy Tests': {
+    'Express SOAP Proxy Tests: ': {
+
+        'Proxy should start': function(done) {
+            require('../soap2json');
+            request('http://localhost:9876/_WSDL', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(404, res.statusCode);
+                done();
+            });
+        },
+
+        'Proxy should answer 404 when SOAP server is not responding': function(done) {
+            request('http://localhost:9876/api/_WSDL/_describe', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(404, res.statusCode);
+                assert.equal("Unknown WSDL: _WSDL", body);
+                done();
+            });
+        },
 
         'SOAP server should start': function(done) {
             var wsdl = fs.readFileSync(__dirname+'/wsdl/stockquote.wsdl', 'utf8'),
@@ -31,47 +49,60 @@ module.exports = {
             request('http://localhost:15099', function(err, res, body) {
                 assert.ok(!err);
                 done();
-            })
+            });
         },
 
-        'Proxy should start': function(done) {
-            proxy = require('../server');
-            request('http://localhost:9876', function(err, res, body) {
+        'Proxy should answer 404 when asked for inexistant WSDL': function(done) {
+            request('http://localhost:9876/api/_WSDL/_METHOD', function(err, res, body) {
                 assert.ok(!err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(404, res.statusCode);
+                assert.equal("Unknown WSDL: _WSDL", body);
                 done();
-            })
+            });
         },
 
-        'Proxy should answer 400 when asked for inexistant WSDL': function(done) {
-            request('http://localhost:9876/_WSDL/_SERVICE', function(err, res, body) {
+        'Proxy should answer 400 when asked for wrong method': function(done) {
+            request('http://localhost:9876/api/stockquote/_METHOD', function(err, res, body) {
                 assert.ok(!err);
-                assert.equal(res.statusCode, 400);
-                assert.equal(body, "Unknown WSDL: _WSDL");
-                done();
-            })            
-        },
-
-        'Proxy should answer 400 when asked for wrong service': function(done) {
-            request('http://localhost:9876/stockquote/_SERVICE', function(err, res, body) {
-                assert.ok(!err);
-                assert.equal(res.statusCode, 400);
-                console.log(body);
+                assert.equal(400, res.statusCode);
+                assert.equal("Unknown method: _METHOD\nUse one of: _describe, GetLastTradePrice", body);
                 assert.ok(body.length);
                 done();
-            })            
+            });           
+        },
+
+        'Proxy should answer 400 when called with wrong querystring': function(done) {
+            request('http://localhost:9876/api/stockquote/GetLastTradePrice?PARAM=GOOG', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(400, res.statusCode);
+                assert.equal( "Unexpected parameter: PARAM\nUse one of: tradeList", body );
+                done();
+            });            
+        },
+
+        'Proxy should yield complete service description': function(done) {
+            request('http://localhost:9876/api/stockquote/_describe', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(200, res.statusCode);
+                assert.deepEqual( {"StockQuoteService":{
+                   "StockQuotePort":{
+                      "GetLastTradePrice":{
+                         "input":{ "tradeList":{"Trade[]": "Trade|string|AAPL,GOOG"} },
+                         "output":{ "price":"float" }
+                      }
+                   }
+                }}, JSON.parse(body) );
+                done();
+            });            
+        },
+
+        'Service should work when called with correct parameters': function(done) {
+            request('http://localhost:9876/api/stockquote/GetLastTradePrice?tradeList=GOOG,AAPL', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(200, res.statusCode);
+                assert.deepEqual( { price: 19.56 }, JSON.parse(body) );
+                done();
+            });            
         }
-
-//         'Proxy should answer 400 when asked for service with wrong param names': function(done) {
-//             request('http://localhost:9876/stockquote/getLastTradePrice?PARAM=GOOG', function(err, res, body) {
-//                 assert.ok(!err);
-//                 console.log(res.statusCode);
-//                 console.log(body);
-// //                 assert.equal(res.statusCode, 400);
-// //                 assert.ok(body.length);
-//                 done();
-//             })            
-//         }
    }
-}
-
+};
