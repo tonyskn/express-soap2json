@@ -3,7 +3,7 @@
 
 var soapController = require("./index.js"),
     express = require("express"),
-    server = express.createServer();
+    server = express();
 
 // if not root, use dummy config required by test script
 // otherwise, parse config from command-line arguments
@@ -21,21 +21,18 @@ if (!config.port || !config.soapUrl) {
    process.exit(1);
 }
 
-// our catcher for log messages
-process.addListener('uncaughtException', function (err, stack) {
-   var message = 'Caught exception: ' + err;
-   console.log(message);
-});
 
 if (config.verbose)
    server.use(express.logger({ format: '\x1b[1m:method\x1b[0m :url\x1b[0m :response-time ms\x1b[0m :status' }));
 
 soapController.configure(server, config.soapUrl, config.prefix);
 
+
 console.log("Using SOAP server on: ", config.soapUrl);
 console.log("Listening on port: ", config.port);
 if (config.prefix !== "")
    console.log("Service urls use prefix: ", config.prefix);
 console.log();
+
 
 server.listen(config.port);

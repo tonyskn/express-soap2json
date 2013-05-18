@@ -15,8 +15,7 @@ var resolveWsdl = function(soapServerUrl) {
 
       soap.createClient(wsdlUrl, function(err, client) {
          if (err || typeof client === "undefined") { 
-            next(new CustomError("Error retrieving WSDL: " + serviceName, 404));
-            return;
+            return next(new CustomError("Error retrieving WSDL: " + serviceName, 404));
          }
 
          req._client = client;
@@ -39,13 +38,11 @@ var resolveService = function(req, res, next) {
              "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
 
    if (req.params.method === "_describe") {
-      res.send( JSON.stringify(description), {"Content-Type": "application/json"} );
-      return;
+      return res.json(description);
    }
 
    if (typeof client[req.params.method] !== "function") {
-      next(new CustomError(msg, 400));
-      return;
+      return next(new CustomError(msg, 400));
    }
 
    req._spec = availableMethods[req.params.method].input;
@@ -62,8 +59,7 @@ var normalizeQuerystring = function(req, res, next) {
           typeof req._spec[querystringKey] === "undefined" ) {
          var msg = "Unexpected parameter: " + querystringKey + "\n" +
                    "Use one of: " + Object.keys(req._spec).join(", ");
-         next(new CustomError(msg, 400));
-         return;
+         return next(new CustomError(msg, 400));
       }
    }
 
@@ -93,31 +89,27 @@ var normalizeQuerystring = function(req, res, next) {
 };
 
 
+var errorHandler = function(err, req, res, next) {
+   res.send(err.message, err.httpStatus || 500);
+};
+
+
 exports.configure = function(express, soapServerUrl, prefix) {
    prefix = prefix || "/";
    if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
    if (prefix.substr(-1) !== "/") prefix += "/";
    if (prefix[0] !== "/") prefix = "/"+prefix;
 
-   express.error(function(err, req, res, next) {
-      if (err instanceof CustomError) {
-         res.send(err.message, err.httpStatus);
-      } else {
-         next(err);
-      }
-   });
-
    express.get( prefix+":service/:method", 
-      [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring], 
-      function(req, res, next) {
+      [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring, errorHandler], 
+      function(req, res) {
          req._service( req._query, function(err, result) {
             if (err) { 
                res.send(err.message, 500);
                return;
             }
 
-            var json = JSON.stringify(result);
-            res.send(json, {"Content-Type": "application/json"});
+            res.json(result);
          } );
       }
    );

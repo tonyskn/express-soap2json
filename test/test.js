@@ -107,7 +107,7 @@ module.exports = {
         },
         
         'SOAP proxy should be embeddable in an Express app': function(done) {
-            var server = express.createServer();
+            var server = express();
             require('../').configure( server, 'http://localhost:15099/', 'api' );
             server.listen('9999');
 
