@@ -15,15 +15,15 @@
      "test": "node_modules/.bin/mocha -R spec -u exports test/*.js"
   },
   "engines": {
-    "node": ">=0.6.0"
+    "node": ">=0.10.0"
   },
   "dependencies": {
      "soap"     : "0.2.7",
-     "commander": "0.5.2",
+     "commander": "1.1.1",
      "express"  : "2.5.8"
   },
   "devDependencies": {
-     "mocha"    : "1.0.3",
-     "request"  : "2.9.0"
+     "mocha"    : "1.9.0",
+     "request"  : "2.21.0"
   }
 }
