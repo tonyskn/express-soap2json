@@ -32,7 +32,7 @@ module.exports = {
             request('http://localhost:9876/api/_WSDL/_describe', function(err, res, body) {
                 assert.ok(!err);
                 assert.equal(404, res.statusCode);
-                assert.equal("Unknown WSDL: _WSDL", body);
+                assert.equal("Error retrieving WSDL: _WSDL", body);
                 done();
             });
         },
@@ -56,7 +56,7 @@ module.exports = {
             request('http://localhost:9876/api/_WSDL/_METHOD', function(err, res, body) {
                 assert.ok(!err);
                 assert.equal(404, res.statusCode);
-                assert.equal("Unknown WSDL: _WSDL", body);
+                assert.equal("Error retrieving WSDL: _WSDL", body);
                 done();
             });
         },

@@ -14,13 +14,8 @@ var resolveWsdl = function(soapServerUrl) {
           wsdlUrl = soapServerUrl + serviceName + "?wsdl";
 
       soap.createClient(wsdlUrl, function(err, client) {
-         if (err) { 
-            next(new CustomError(err.message));
-            return;
-         }
-
-         if (typeof client === "undefined") { 
-            next(new CustomError("Unknown WSDL: " + serviceName, 404));
+         if (err || typeof client === "undefined") { 
+            next(new CustomError("Error retrieving WSDL: " + serviceName, 404));
             return;
          }
 

@@ -18,7 +18,7 @@
     "node": ">=0.6.0"
   },
   "dependencies": {
-     "soap"     : "0.2.4",
+     "soap"     : "0.2.7",
      "commander": "0.5.2",
      "express"  : "2.5.8"
   },
