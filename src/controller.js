@@ -1,6 +1,30 @@
 var soap = require("soap");
 
 
+exports.configure = function(express, soapServerUrl, prefix) {
+   prefix = prefix || "/";
+   if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
+   if (prefix.substr(-1) !== "/") prefix += "/";
+   if (prefix[0] !== "/") prefix = "/"+prefix;
+
+   express.get( prefix+":service/:method", 
+      [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring, errorHandler], 
+      function(req, res) {
+         req._service( req._query, function(err, result) {
+            if (err) { 
+               res.send(err.message, 500);
+               return;
+            }
+
+            res.json(result);
+         } );
+      }
+   );
+
+   return express;
+}; 
+
+
 var CustomError = function(msg, httpStatus) {
    this.message = msg || "Unexpected error!";
    this.httpStatus = httpStatus || 500;
@@ -94,25 +118,3 @@ var errorHandler = function(err, req, res, next) {
 };
 
 
-exports.configure = function(express, soapServerUrl, prefix) {
-   prefix = prefix || "/";
-   if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
-   if (prefix.substr(-1) !== "/") prefix += "/";
-   if (prefix[0] !== "/") prefix = "/"+prefix;
-
-   express.get( prefix+":service/:method", 
-      [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring, errorHandler], 
-      function(req, res) {
-         req._service( req._query, function(err, result) {
-            if (err) { 
-               res.send(err.message, 500);
-               return;
-            }
-
-            res.json(result);
-         } );
-      }
-   );
-
-   return express;
-}; 
