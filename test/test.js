@@ -2,7 +2,8 @@ var fs = require('fs'),
     soap = require('soap'),
     assert = require('assert'),
     request = require('request'),
-    http = require('http');
+    http = require('http'),
+    express = require('express');
 
 var service = { 
  StockQuoteService: { 
@@ -103,6 +104,20 @@ module.exports = {
                 assert.deepEqual( { price: 19.56 }, JSON.parse(body) );
                 done();
             });            
+        },
+        
+        'SOAP proxy should be embeddable in an Express app': function(done) {
+            var server = express.createServer();
+            require('../').configure( server, 'http://localhost:15099/', 'api' );
+            server.listen('9999');
+
+            request('http://localhost:9999/api/stockquote/_METHOD', function(err, res, body) {
+                assert.ok(!err);
+                assert.equal(400, res.statusCode);
+                assert.equal("Unknown method: _METHOD\nUse one of: _describe, GetLastTradePrice", body);
+                assert.ok(body.length);
+                done();
+            });
         }
    }
 };
