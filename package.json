@@ -1,7 +1,7 @@
 {
   "name": "express-soap2json",
   "description": "Node based JSON/HTTP proxy to SOAP webservices",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Tony Sokhon <tonyskn@gmail.com>",
   "repository": {
     "type": "git",
@@ -22,16 +22,19 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "peerDependencies": {
+     "express": "~3.2.4"
+  },
   "dependencies": {
     "soap": "0.2.7",
-    "commander": "1.1.1",
-    "express": "3.2.4"
+    "commander": "~1.1.1",
+    "express": "~3.2.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.8",
     "grunt-contrib-jshint": "~0.5.2",
-    "grunt-mocha-cov": "0.0.7",
+    "grunt-mocha-cov": "~0.0.7",
     "request": "~2.21.0"
   }
 }
