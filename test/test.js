@@ -21,7 +21,7 @@ module.exports = {
     'Express SOAP Proxy Tests: ': {
 
         'Proxy should start': function(done) {
-            require('../soap2json');
+            require('../src/soap2json.js');
             request('http://localhost:9876/_WSDL', function(err, res, body) {
                 assert.ok(!err);
                 assert.equal(404, res.statusCode);

@@ -1,6 +1,6 @@
 # express-soap2json
 
-[![Build Status](https://secure.travis-ci.org/tonyskn/express-soap2json.png)](http://travis-ci.org/tonyskn/express-soap2json)
+[![Build Status][travis-image]][travis] [![Coverage Status][coveralls-image]][coveralls]
 
 Node based JSON/HTTP proxy to SOAP webservices.
 
@@ -42,3 +42,10 @@ var soap = require('express-soap2json'),
 ```
 
 Take a look at the Mocha tests for more detailed examples.
+
+
+[travis]: http://travis-ci.org/tonyskn/express-soap2json
+[travis-image]: https://secure.travis-ci.org/tonyskn/express-soap2json.png?branch=master
+[coveralls]: https://coveralls.io/r/tonyskn/express-soap2json
+[coveralls-image]: https://coveralls.io/repos/tonyskn/express-soap2json/badge.png?branch=master
+
