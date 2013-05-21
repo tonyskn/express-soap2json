@@ -17,11 +17,13 @@ var service = {
     }
  }};
 
+// start proxy
+require('../soap2json');
+
 module.exports = {
     'Express SOAP Proxy Tests: ': {
 
         'Proxy should start': function(done) {
-            require('../src/soap2json.js');
             request('http://localhost:9876/_WSDL', function(err, res, body) {
                 assert.ok(!err);
                 assert.equal(404, res.statusCode);
