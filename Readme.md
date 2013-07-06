@@ -20,7 +20,7 @@ npm install -g express-soap2json
 
 This module can be used in two ways: 
 
-### As a standalone proxy server
+### Standalone proxy server
 
 If you just need a simple proxy running out of the box, use the provided `soap2json` command:
 
@@ -28,15 +28,15 @@ If you just need a simple proxy running out of the box, use the provided `soap2j
 soap2json -p <port> -u <http://soap-server/services/>
 ```
 
-### As a library
+### Express middleware
 
-Inside you own application, you can configure an Express server to route some requests to SOAP webservices:
+Inside you own Express application, you can configure an Express server to route some requests to SOAP webservices:
 
 ```javascript
-var soap = require('express-soap2json'),
-    server = require('express').createServer();
+var soap2json = require('express-soap2json'),
+    server = require('express')();
 
-    soap.configure( server, "<soap server url>", "<JSON apis prefix>" );
+    server.use( soap2json("<soap server url>", "<JSON apis prefix>") );
 
     server.listen(...)
 ```

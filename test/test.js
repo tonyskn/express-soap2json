@@ -109,8 +109,9 @@ module.exports = {
         },
         
         'SOAP proxy should be embeddable in an Express app': function(done) {
-            var server = express();
-            require('../').configure( server, 'http://localhost:15099/', 'api' );
+            var server = express(),
+                soap = require('../');
+            server.use( soap('http://localhost:15099', 'api') );
             server.listen('9999');
 
             request('http://localhost:9999/api/stockquote/_METHOD', function(err, res, body) {

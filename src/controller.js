@@ -1,13 +1,15 @@
-var soap = require("soap");
+var soap = require("soap"),
+    ExpressRouter = require('express/lib/router');
 
 
-exports.configure = function(express, soapServerUrl, prefix) {
+exports = module.exports = function(soapServerUrl, prefix) {
    prefix = prefix || "/";
    if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
    if (prefix.substr(-1) !== "/") prefix += "/";
    if (prefix[0] !== "/") prefix = "/"+prefix;
 
-   express.get( prefix+":service/:method", 
+   var router = new ExpressRouter();
+   router.route('get', prefix+":service/:method", 
       [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring, errorHandler], 
       function(req, res) {
          req._service( req._query, function(err, result) {
@@ -21,7 +23,7 @@ exports.configure = function(express, soapServerUrl, prefix) {
       }
    );
 
-   return express;
+   return router.middleware.bind(router);
 }; 
 
 

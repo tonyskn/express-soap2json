@@ -1,7 +1,7 @@
 #!/usr/bin/node
 // vim:ft=javascript
 
-var soapController = require("./index.js"),
+var soap = require("./index.js"),
     express = require("express"),
     server = express();
 
@@ -21,11 +21,10 @@ if (!config.port || !config.soapUrl) {
    process.exit(1);
 }
 
-
 if (config.verbose)
    server.use(express.logger({ format: '\x1b[1m:method\x1b[0m :url\x1b[0m :response-time ms\x1b[0m :status' }));
 
-soapController.configure(server, config.soapUrl, config.prefix);
+server.use( soap(config.soapUrl, config.prefix) );
 
 
 if (config.verbose) {
