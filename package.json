@@ -7,12 +7,12 @@
     "type": "git",
     "url": "https://github.com/tonyskn/express-soap2json"
   },
-  "main": "./index.js",
+  "main": "index.js",
   "bin": {
-    "soap2json": "./soap2json"
+    "soap2json": "soap2json"
   },
   "scripts": {
-    "test": "./node_modules/.bin/grunt test",
+    "test": "grunt test",
     "blanket": {
       "pattern": [
         "src"
@@ -23,18 +23,18 @@
     "node": ">=0.10.0"
   },
   "peerDependencies": {
-     "express": "~3.2.4"
+     "express": "~3"
   },
   "dependencies": {
-    "soap": "0.2.7",
-    "commander": "~1.1.1",
-    "express": "~3.2.4"
+    "soap": "0.3.2",
+    "commander": "~2.2.0",
+    "express": "~3.5.x"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-cli": "~0.1.8",
-    "grunt-contrib-jshint": "~0.5.2",
-    "grunt-mocha-cov": "~0.0.7",
-    "request": "~2.21.0"
+    "grunt": "~0.4.4",
+    "grunt-cli": "~0.1.13",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-mocha-cov": "~0.2.1",
+    "request": "~2.34.0"
   }
 }
