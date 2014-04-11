@@ -1,7 +1,7 @@
 {
   "name": "express-soap2json",
   "description": "Node based JSON/HTTP proxy to SOAP webservices",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Tony Sokhon <tonyskn@gmail.com>",
   "repository": {
     "type": "git",
