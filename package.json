@@ -26,7 +26,7 @@
      "express": "~3"
   },
   "dependencies": {
-    "soap": "0.3.2",
+    "soap": "~0.4.2",
     "commander": "~2.2.0",
     "express": "~3.5.x"
   },
