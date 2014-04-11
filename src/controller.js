@@ -1,15 +1,16 @@
-var soap = require("soap"),
+var util = require('util'),
+    soap = require('soap'),
     ExpressRouter = require('express/lib/router');
 
 
 exports = module.exports = function(soapServerUrl, prefix) {
-   prefix = prefix || "/";
-   if (soapServerUrl.substr(-1) !== "/") soapServerUrl += "/";
-   if (prefix.substr(-1) !== "/") prefix += "/";
-   if (prefix[0] !== "/") prefix = "/"+prefix;
+   prefix = prefix || '/';
+   if (soapServerUrl.substr(-1) !== '/') soapServerUrl += '/';
+   if (prefix.substr(-1) !== '/') prefix += '/';
+   if (prefix[0] !== '/') prefix = '/'+prefix;
 
    var router = new ExpressRouter();
-   router.route('get', prefix+":service/:method", 
+   router.route('get', prefix+':service/:method', 
       [resolveWsdl(soapServerUrl), resolveService, normalizeQuerystring, errorHandler], 
       function(req, res) {
          req._service( req._query, function(err, result) {
@@ -18,7 +19,7 @@ exports = module.exports = function(soapServerUrl, prefix) {
                return;
             }
 
-            res.json(result);
+            res.json( removeNils(result) );
          } );
       }
    );
@@ -27,21 +28,39 @@ exports = module.exports = function(soapServerUrl, prefix) {
 }; 
 
 
-var CustomError = function(msg, httpStatus) {
-   this.message = msg || "Unexpected error!";
-   this.httpStatus = httpStatus || 500;
+var removeNils = function(response) {
+  if (!response || typeof response !== 'object') return response;
+
+  else if (util.isArray(response)) return response.map(removeNils);
+
+  else return Object.keys(response).reduce(function(result, key) {
+    var value = response[key];
+
+    if (value.attributes && value.attributes['xsi:nil'] === 'true') result[key] = null;
+    else result[key] = removeNils(value);
+
+    return result;
+  }, {});
 };
-CustomError.prototype = Error.prototype;
+
+
+var CustomError = function(msg, httpStatus) {
+   this.message = msg || 'Unexpected error!';
+   this.httpStatus = httpStatus || 500;
+
+   Error.call(this);
+};
+util.inherits(CustomError, Error);
 
 
 var resolveWsdl = function(soapServerUrl) {
    return function(req, res, next) {
       var serviceName = req.params.service,
-          wsdlUrl = soapServerUrl + serviceName + "?wsdl";
+          wsdlUrl = soapServerUrl + serviceName + '?wsdl';
 
       soap.createClient(wsdlUrl, function(err, client) {
-         if (err || typeof client === "undefined") { 
-            return next(new CustomError("Error retrieving WSDL: " + serviceName, 404));
+         if (err || typeof client === 'undefined') { 
+            return next(new CustomError('Error retrieving WSDL: ' + serviceName, 404));
          }
 
          req._client = client;
@@ -60,14 +79,14 @@ var resolveService = function(req, res, next) {
        description = client.describe(),
        service = req.params.service,
        availableMethods = objValue(objValue(description)),
-       msg = "Unknown method: " + req.params.method + "\n" +
-             "Use one of: _describe, " + Object.keys(availableMethods).join(", ");
+       msg = 'Unknown method: ' + req.params.method + '\n' +
+             'Use one of: _describe, ' + Object.keys(availableMethods).join(', ');
 
-   if (req.params.method === "_describe") {
+   if (req.params.method === '_describe') {
       return res.json(description);
    }
 
-   if (typeof client[req.params.method] !== "function") {
+   if (typeof client[req.params.method] !== 'function') {
       return next(new CustomError(msg, 400));
    }
 
@@ -82,9 +101,9 @@ var normalizeQuerystring = function(req, res, next) {
    // in queryString
    for (var querystringKey in req.query) {
       if ( req.query.hasOwnProperty(querystringKey) &&
-          typeof req._spec[querystringKey] === "undefined" ) {
-         var msg = "Unexpected parameter: " + querystringKey + "\n" +
-                   "Use one of: " + Object.keys(req._spec).join(", ");
+          typeof req._spec[querystringKey] === 'undefined' ) {
+         var msg = 'Unexpected parameter: ' + querystringKey + '\n' +
+                   'Use one of: ' + Object.keys(req._spec).join(', ');
          return next(new CustomError(msg, 400));
       }
    }
@@ -94,14 +113,14 @@ var normalizeQuerystring = function(req, res, next) {
    req._query = Object.keys(req._spec).reduce(function (query, key) {
       var spec = req._spec[key],
           querystringValue = req.query[key];
-      if (typeof spec === 'object' && typeof querystringValue !== "undefined") {
+      if (typeof spec === 'object' && typeof querystringValue !== 'undefined') {
          query[key] = {};
          var specKeys = Object.keys(spec),
              specKey = specKeys[0];
 
          // behaviour for array fields
-         if (specKeys.length === 1 && specKey.substr(-2) === "[]")
-            query[key][specKey.substr(0, specKey.length-2)] = querystringValue.split(",");
+         if (specKeys.length === 1 && specKey.substr(-2) === '[]')
+            query[key][specKey.substr(0, specKey.length-2)] = querystringValue.split(',');
 
          //TODO implement behaviour for complex input objects
       } else {

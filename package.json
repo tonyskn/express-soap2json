@@ -23,7 +23,7 @@
     "node": ">=0.10.0"
   },
   "peerDependencies": {
-     "express": "~3"
+    "express": "~3"
   },
   "dependencies": {
     "soap": "~0.4.2",
