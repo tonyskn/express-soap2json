@@ -1,0 +1,10 @@
+{
+  "name": "express-soap2json-example",
+  "dependencies": {
+    "express": "^4.16.1",
+    "express-soap2json": "^0.4.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
